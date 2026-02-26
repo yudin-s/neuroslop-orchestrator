@@ -1,0 +1,95 @@
+# Общие настройки запуска
+ollama:
+  base_url: "http://localhost:11434"
+
+# Можно задавать отдельные модели на роль
+models:
+  # Оркестратор/аналитик: лучше себя ведут на instruct-моделях
+  orchestrator: "qwen2.5:7b-instruct"
+  security_requirements: "qwen2.5:7b-instruct"
+
+  # Разработка/QA: coder-модели обычно дают меньше синтаксических ошибок в TS/React/Nest
+  frontend: "qwen2.5-coder:7b-instruct"
+  backend: "qwen2.5-coder:7b-instruct"
+  # Дизайн-спеки лучше получаются на instruct
+  designer: "qwen2.5:7b-instruct"
+  qa: "qwen2.5-coder:7b-instruct"
+
+# Политика инструментов (минимальная allowlist)
+tools:
+  shell_allowlist:
+    - "git rev-parse --is-inside-work-tree"
+    - "git status"
+    - "git diff"
+    - "git diff --stat"
+    - "git diff --staged"
+    - "git log -n 10 --oneline"
+    - "git show --name-only"
+    - "git ls-files"
+
+    - "python -V"
+    - "python3 -V"
+    - "node --version"
+    - "npm --version"
+
+    - "pytest"
+    - "python -m pytest"
+
+    - "npm test"
+    - "npm run test"
+    - "npm run test:unit"
+    - "npm run test:integration"
+    - "npm run test:e2e"
+    - "npm run lint"
+    - "npm run lint:fix"
+    - "npm run typecheck"
+    - "npm run build"
+    - "npm run format"
+    - "npm run fmt"
+    - "npm run check"
+
+    - "npx playwright test"
+    - "npx playwright test --ui"
+    - "npx playwright show-report"
+  # Опционально: шаблоны allowlist (fnmatch) для команд shell.
+  # ОСТОРОЖНО: в режиме approval=auto это может запустить неожиданные команды.
+  shell_allowlist_patterns: []
+  max_read_bytes: 400000
+  # Политика чтения (read-only контекст для LLM). denylist применяется всегда.
+  # Если read_allowlist непустой — читать можно только то, что в allowlist.
+  read_denylist:
+    - ".git/**"
+    - ".venv/**"
+    - "**/.venv/**"
+    - "node_modules/**"
+    - "**/node_modules/**"
+    - ".env"
+    - ".env.*"
+    - "**/*.pem"
+    - "**/*.key"
+    - "**/id_rsa*"
+  read_allowlist: []
+
+web:
+  # Включается только если запустить: `python -m local_agents run ... --web on`
+  enabled: true
+  timeout_s: 20
+  max_bytes: 300000
+  # Разрешаем только публичные домены из списка (суффиксное совпадение).
+  allow_domains:
+    - duckduckgo.com
+    - github.com
+    - raw.githubusercontent.com
+    - docs.python.org
+    - pydantic.dev
+    - pytest.org
+    - nodejs.org
+    - npmjs.com
+    - react.dev
+    - tailwindcss.com
+    - developer.mozilla.org
+    - expressjs.com
+    - fastify.dev
+    - docs.nestjs.com
+    - mongodb.com
+    - playwright.dev

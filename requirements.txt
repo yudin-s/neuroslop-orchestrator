@@ -1,0 +1,7 @@
+requests>=2.31.0
+pydantic>=2.6.0
+PyYAML>=6.0.1
+rich>=13.7.0
+fastapi>=0.110
+uvicorn>=0.24
+pytest>=8.0.0

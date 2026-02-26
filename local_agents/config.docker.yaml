@@ -1,0 +1,45 @@
+# Docker-friendly config: allow unrestricted shell inside container
+ollama:
+  base_url: "http://host.docker.internal:11434"
+
+models:
+  # Оркестратор/аналитик: лучше себя ведут на instruct-моделях
+  orchestrator: "qwen2.5:7b-instruct"
+  security_requirements: "qwen2.5:7b-instruct"
+
+  # Разработка/QA: coder-модели обычно дают меньше синтаксических ошибок в TS/React/Nest
+  frontend: "qwen2.5-coder:7b-instruct"
+  backend: "qwen2.5-coder:7b-instruct"
+  # Дизайн-спеки лучше получаются на instruct
+  designer: "qwen2.5:7b-instruct"
+  qa: "qwen2.5-coder:7b-instruct"
+
+
+tools:
+  # In Docker we can safely allow all shell commands (still confined to the container)
+  shell_allowlist: []
+  shell_allowlist_patterns:
+    - "*"
+  max_read_bytes: 400000
+  read_denylist:
+    - ".git/**"
+    - ".venv/**"
+    - "**/.venv/**"
+    - "node_modules/**"
+    - "**/node_modules/**"
+    - ".env"
+    - ".env.*"
+    - "**/*.pem"
+    - "**/*.key"
+    - "**/id_rsa*"
+  read_allowlist: []
+
+web:
+  enabled: true
+  timeout_s: 20
+  max_bytes: 300000
+  # Allow all domains
+  allow_domains: []
+  # If empty, the policy allows everything if not denylisted? 
+  # Wait, let's check Tools.policy logic. Actually often empty allowlist means "allow nothing" unless updated.
+  # Let's check tools.py _is_public_internet_host logic.

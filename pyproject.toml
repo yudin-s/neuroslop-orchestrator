@@ -1,0 +1,19 @@
+[project]
+name = "local-multiagent"
+version = "0.1.0"
+description = "Lightweight local multi-agent orchestrator (frontend/backend/security+requirements/qa) using small Ollama models"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+	{ name = "Serge Judin" }
+]
+maintainers = [
+	{ name = "Serge Judin" }
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

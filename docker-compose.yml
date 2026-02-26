@@ -1,0 +1,48 @@
+services:
+  ui:
+    build: .
+    command: ["serve", "--repo", "/repo", "--host", "0.0.0.0", "--port", "8080"]
+    ports:
+      - "8080:8080"
+    environment:
+      # Ollama runs on host macOS (Metal). Docker reaches it via host.docker.internal.
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      # Mount the target workspace (read-only) + artifacts (read-write)
+      - ./:/repo:ro
+      - ./artifacts:/repo/artifacts:rw
+
+  ui-dev:
+    profiles: ["dev"]
+    build: .
+    command: ["serve", "--repo", "/repo", "--host", "0.0.0.0", "--port", "8080"]
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      # Dev: workspace is read-write (allows patch apply)
+      - ./:/repo:rw
+      - ./artifacts:/repo/artifacts:rw
+
+  agents:
+    build: .
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      - ./:/repo:rw
+      - ./artifacts:/repo/artifacts:rw
+    # Allow interactive approvals when you run `docker compose run` with a TTY.
+    stdin_open: true
+    tty: true
+
+  agents-dev:
+    profiles: ["dev"]
+    build: .
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    volumes:
+      - ./:/repo:rw
+      - ./artifacts:/repo/artifacts:rw
+    stdin_open: true
+    tty: true
